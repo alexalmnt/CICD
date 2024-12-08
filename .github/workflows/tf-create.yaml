@@ -1,50 +1,46 @@
 name: Terraform Create
 
 on:
-   push:
+  push:
     branches:
       - main
-    
-   workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   createinfra:
-    runs-on: ubuntu-latest #execute jobs in workflow
+    runs-on: ubuntu-latest # execute job in workflow
 
     steps:
-     - name: Pull code from repo # Checkout Code
-       uses: actions/checkout@v4
+    - name: Pull code from repo # Checkout code
+      uses: actions/checkout@v4
 
-     - name: Install Terraform 
-       uses: hashicorp/setup-terraform@v3
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-     - name: Configure AWS credentials 
-       uses: aws-actions/configure-aws-credentials@v4
-       with:
-         aws-access-key-id: ${{ secrets.ACCESS_KEY }}
-         aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
-         aws-region: us-east-1
+    - name: Terraform Init
+      id: Init
+      run: terraform init
+      working-directory: terraform
 
-     - name: Terraform init
-       id: Init
-       run: terraform init
-       working-directory: terraform 
+    - name: Terraform Validate
+      id: Validate
+      run: terraform validate
+      working-directory: terraform
 
-     - name: Terraform validate
-       id: validate
-       run: terraform validate
-       working-directory: terraform 
+    - name: Terraform Plan
+      id: Plan
+      run: terraform plan
+      working-directory: terraform   
 
-
-     - name: Terraform plan
-       id: plan
-       run: terraform plan
-       working-directory: terraform
-
-
-     - name: Terraform apply
-       id: apply
-       if: github.ref == 'refs/heads/main'
-       run: terraform apply --auto-approve
-       working-directory: terraform
-
+    - name: Terraform Apply
+      id: Apply
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply --auto-approve
+      working-directory: terraform 
