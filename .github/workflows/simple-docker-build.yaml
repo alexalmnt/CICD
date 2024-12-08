@@ -2,8 +2,8 @@ name: build and push docker image
 
 on:
   push:
-    tags:
-    - "*"
+    branches:
+    - main
 
 jobs: 
   build_and_push:
@@ -22,6 +22,6 @@ jobs:
     - name: build and Tag image
       run: docker build -t "${{ secrets.DOCKERHUB_USERNAME}}/myimage:latest" .
       working-directory: docker
-      
+
     - name: push docker image to docker hub
       run: docker push "${{ secrets.DOCKERHUB_USERNAME }}/myimage:latest"
