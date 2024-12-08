@@ -1,0 +1,27 @@
+name: build and push docker image
+
+on:
+  push:
+    tags:
+    - "*"
+
+jobs: 
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup docker buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: log in to docker hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    - name: build and Tag image
+      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME}}/myimage:latest" .
+      working-directory: docker
+      
+    - name: push docker image to docker hub
+      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}/myimage:latest"
