@@ -1,0 +1,32 @@
+name: Terraform destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroyinfra:
+    runs-on: ubuntu-latest # execute job in workflow
+
+    steps:
+    - name: Pull code from repo # Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Terraform Init
+      id: Init
+      run: terraform init
+      working-directory: terraform 
+
+    - name: Terraform destroy
+      id: destroy
+      run: terraform apply --auto-approve
+      working-directory: terraform 
