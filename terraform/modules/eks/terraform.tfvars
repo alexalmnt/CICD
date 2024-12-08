@@ -1,0 +1,2 @@
+eksclustername = "tfekscluster"
+eksnodegroupname = "fnodegroup"
