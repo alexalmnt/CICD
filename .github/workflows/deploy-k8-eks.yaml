@@ -1,0 +1,30 @@
+name: Deploy to EKS
+on:
+  workflow_run:
+    workflows: ["build and push docker image"]
+    types:
+      - completed
+
+jobs:
+  deploy_eks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v4
+
+   - name: Configure AWS credentials
+     uses: aws-actions/configure-aws-credentials@v4
+     with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+   - name: update kubeconfig
+     run: aws eks update-kubeconfig --region us-east-1  --name tfekscluster
+
+   - name: apply deployment manifest
+     run: kubectl apply -f apache_deployment.yaml
+     working-directory: k8
+
+
